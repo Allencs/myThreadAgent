@@ -1,8 +1,11 @@
 package com.allen;
 
+import com.liubs.findinstances.jvmti.InstancesOfClass;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * Unit test for simple App.

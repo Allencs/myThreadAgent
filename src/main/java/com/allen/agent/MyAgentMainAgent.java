@@ -1,9 +1,11 @@
 package com.allen.agent;
 
+import com.liubs.findinstances.jvmti.InstancesOfClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.instrument.Instrumentation;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * @Author: allen
@@ -21,6 +23,7 @@ public class MyAgentMainAgent {
             int time = Integer.parseInt(params[1]);
             logger.info("Agent load successfully [threadNum:{} sleepTime:{}s]", threadNum, time);
             runThreadLab(threadNum, time);
+            getTargetThreadPool("");
         } catch (Exception e) {
             logger.info("Agent load failed. ", e);
         }

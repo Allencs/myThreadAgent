@@ -78,7 +78,7 @@
             <manifestEntries>
               <Manifest-Version>1.0</Manifest-Version>
               <Built-By>allen</Built-By>
-              <Main-Class>com.allen.Attacher</Main-Class>
+<!--              <Main-Class>com.allen.Attacher</Main-Class>-->
               <Agent-Class>com.allen.agent.MyAgentMainAgent</Agent-Class>
 <!--              <Class-Path>tools.jar</Class-Path>-->
               <Can-Retransform-Classes>true</Can-Retransform-Classes>
