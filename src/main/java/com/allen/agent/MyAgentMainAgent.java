@@ -1,5 +1,6 @@
 package com.allen.agent;
 
+import com.liubs.findinstances.jvmti.InstancesOfClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,13 +22,14 @@ public class MyAgentMainAgent {
             int time = Integer.parseInt(params[1]);
             logger.info("Agent load successfully [threadNum:{} sleepTime:{}s]", threadNum, time);
             runThreadLab(threadNum, time);
+            getTargetInstances("");
         } catch (Exception e) {
             logger.info("Agent load failed. ", e);
         }
     }
 
     public static void runThreadLab(int threadNum, int time) {
-        logger.info("OOM caused by too many thread lab started");
+        logger.info("[OOM caused by too many thread] lab started");
         int i = 0;
         while (i < threadNum) {
             Thread t = new Thread(() -> {
@@ -40,6 +42,14 @@ public class MyAgentMainAgent {
             });
             t.start();
             i++;
+        }
+    }
+
+    public static void getTargetInstances(String className) {
+        Object[] instances = InstancesOfClass.getInstances(Thread.class);
+        for (Object instance : instances) {
+            Thread t = (Thread) instance;
+            System.out.println(t.getName());
         }
     }
 }
