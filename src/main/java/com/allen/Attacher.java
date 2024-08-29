@@ -29,6 +29,9 @@ public class Attacher {
     @Option(name = "-t", aliases = "--sleepTime", required = true, usage = "thread sleep time")
     public int time;
 
+    @Option(name = "-c", aliases = "--class", required = true, usage = "target className")
+    public String className;
+
     public static void main(String[] args) throws Exception {
         System.exit(new Attacher().doMain(args));
     }
@@ -37,7 +40,7 @@ public class Attacher {
         CmdLineParser parser = new CmdLineParser(this);
         try {
             parser.parseArgument(args);
-            String params = threadNum + "-" + time;
+            String params = threadNum + "-" + time + "-" + className;
             VirtualMachine vm = VirtualMachine.attach(pid);
             vm.loadAgent(agentFile, params);
             return 0;

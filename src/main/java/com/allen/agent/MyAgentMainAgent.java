@@ -5,6 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.instrument.Instrumentation;
+import java.lang.reflect.Field;
+import java.util.Vector;
 
 /**
  * @Author: allen
@@ -20,11 +22,12 @@ public class MyAgentMainAgent {
             String[] params = args.split("-");
             int threadNum = Integer.parseInt(params[0]);
             int time = Integer.parseInt(params[1]);
+            String className = params[2];
             if (threadNum != 0) {
                 logger.info("Agent load successfully [threadNum:{} sleepTime:{}s]", threadNum, time);
                 runThreadLab(threadNum, time);
             }
-//            getTargetInstances("");
+            getTargetInstances(className);
         } catch (Exception e) {
             logger.info("Agent load failed. ", e);
         }
@@ -47,11 +50,39 @@ public class MyAgentMainAgent {
         }
     }
 
+    /**
+     * 获取类的所有对象实例
+     *
+     * @param className 类对象
+     */
     public static void getTargetInstances(String className) {
+//        Class targetClass = null;
+//        Vector<Class> classes = getLoadedClasses(Thread.currentThread().getContextClassLoader());
+//        for (Class cls : classes) {
+//            logger.info("{}", cls.getClass());
+//        }
         Object[] instances = InstancesOfClass.getInstances(Thread.class);
         for (Object instance : instances) {
             Thread t = (Thread) instance;
             System.out.println(t.getName());
+        }
+    }
+
+    /**
+     * 获取内存中加载的类
+     *
+     * @param classLoader 类加载器
+     * @return Vector
+     */
+    public static Vector<Class> getLoadedClasses(ClassLoader classLoader) {
+        try {
+            Field classField = ClassLoader.class.getDeclaredField("classes");
+            classField.setAccessible(true);
+
+            Vector<Class> classes = (Vector<Class>) classField.get(classLoader);
+            return classes;
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 }
