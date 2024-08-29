@@ -4,13 +4,18 @@ import com.sun.tools.attach.VirtualMachine;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @Author: allen
  * @Date: 2022/4/23 16:18
  * @Description:
  **/
+
 public class Attacher {
+
+    private final static Logger logger = LoggerFactory.getLogger(Attacher.class);
 
     @Option(name = "-f", aliases = "--file", usage = "agent file")
     public String agentFile;
@@ -37,6 +42,7 @@ public class Attacher {
             vm.loadAgent(agentFile, params);
             return 0;
         } catch (CmdLineException e) {
+            logger.error("", e);
             return 1;
         }
     }

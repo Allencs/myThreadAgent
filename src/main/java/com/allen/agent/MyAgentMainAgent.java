@@ -20,9 +20,11 @@ public class MyAgentMainAgent {
             String[] params = args.split("-");
             int threadNum = Integer.parseInt(params[0]);
             int time = Integer.parseInt(params[1]);
-            logger.info("Agent load successfully [threadNum:{} sleepTime:{}s]", threadNum, time);
-            runThreadLab(threadNum, time);
-            getTargetInstances("");
+            if (threadNum != 0) {
+                logger.info("Agent load successfully [threadNum:{} sleepTime:{}s]", threadNum, time);
+                runThreadLab(threadNum, time);
+            }
+//            getTargetInstances("");
         } catch (Exception e) {
             logger.info("Agent load failed. ", e);
         }

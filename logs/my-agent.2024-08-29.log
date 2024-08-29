@@ -1,0 +1,6 @@
+2024-08-29 13:46:55.040 [main] [] ERROR com.allen.Attacher - 
+org.kohsuke.args4j.CmdLineException: Option "-t (--sleepTime)" is required
+	at org.kohsuke.args4j.CmdLineParser.checkRequiredOptionsAndArguments(CmdLineParser.java:588)
+	at org.kohsuke.args4j.CmdLineParser.parseArgument(CmdLineParser.java:534)
+	at com.allen.Attacher.doMain(Attacher.java:39)
+	at com.allen.Attacher.main(Attacher.java:33)
