@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.instrument.Instrumentation;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Vector;
 
 /**
@@ -56,15 +58,39 @@ public class MyAgentMainAgent {
      * @param className 类对象
      */
     public static void getTargetInstances(String className) {
-//        Class targetClass = null;
-//        Vector<Class> classes = getLoadedClasses(Thread.currentThread().getContextClassLoader());
-//        for (Class cls : classes) {
-//            logger.info("{}", cls.getClass());
-//        }
-        Object[] instances = InstancesOfClass.getInstances(Thread.class);
-        for (Object instance : instances) {
-            Thread t = (Thread) instance;
-            System.out.println(t.getName());
+        Class targetClass = null;
+        Vector<Class> classes = getLoadedClasses(Thread.currentThread().getContextClassLoader());
+        for (Class cls : classes) {
+            logger.debug("{}", cls.getName());
+            if (cls.getName().contains(className)) {
+                logger.info("找到目标类 => {}", cls.getName());
+                targetClass = cls;
+                break;
+            }
+        }
+        if (targetClass == null) {
+            logger.error("未找到目标类 [{}]", className);
+            return;
+        }
+        Object[] instances = InstancesOfClass.getInstances(targetClass);
+        Object targetInstance = null;
+        if (instances.length != 0) {
+            targetInstance = instances[0];
+            logger.info("目标类对象实例 => {}", targetInstance);
+            try {
+                Method method = targetInstance.getClass().getMethod("submit");
+                Runnable runnable = () -> {
+                    try {
+                        logger.info("开始睡眠～～～～");
+                        Thread.sleep(5 * 1000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                };
+                method.invoke(targetInstance, runnable);
+            } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
