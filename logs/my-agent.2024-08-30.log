@@ -1,0 +1,6 @@
+2024-08-30 22:09:39.163 [main] [] ERROR com.allen.Attacher - 
+org.kohsuke.args4j.CmdLineException: Option "-c (--class)" is required
+	at org.kohsuke.args4j.CmdLineParser.checkRequiredOptionsAndArguments(CmdLineParser.java:588)
+	at org.kohsuke.args4j.CmdLineParser.parseArgument(CmdLineParser.java:534)
+	at com.allen.Attacher.doMain(Attacher.java:42)
+	at com.allen.Attacher.main(Attacher.java:36)

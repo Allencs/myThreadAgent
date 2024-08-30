@@ -49,6 +49,7 @@ public class MyClassLoader extends ClassLoader {
 
                 //非自定义的类还是走双亲委派加载
                 if (!name.startsWith("com.allen")) {
+                    System.out.println("双亲委派");
                     c = this.getParent().loadClass(name);
                 } else {
                     c = findClass(name);

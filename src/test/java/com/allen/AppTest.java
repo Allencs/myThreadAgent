@@ -1,6 +1,7 @@
 package com.allen;
 
 
+import com.allen.classloader.MyClassLoader;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -33,4 +34,10 @@ public class AppTest
         assertTrue(true);
     }
 
+    public void testMyClassLoader() throws ClassNotFoundException {
+        MyClassLoader classLoader = new MyClassLoader("./");
+        Class cls = classLoader.loadClass("java.lang.Runnable");
+        System.out.println(cls);
     }
+
+}

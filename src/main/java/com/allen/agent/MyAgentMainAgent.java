@@ -8,7 +8,10 @@ import java.lang.instrument.Instrumentation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Author: allen
@@ -25,11 +28,13 @@ public class MyAgentMainAgent {
             int threadNum = Integer.parseInt(params[0]);
             int time = Integer.parseInt(params[1]);
             String className = params[2];
+            String methodName = params[3];
             if (threadNum != 0) {
                 logger.info("Agent load successfully [threadNum:{} sleepTime:{}s]", threadNum, time);
                 runThreadLab(threadNum, time);
             }
-            getTargetInstances(className);
+            Class[] parameterTypes = {Runnable.class, long.class, long.class, TimeUnit.class};
+            invokeTargetMethod(className, methodName, parameterTypes);
         } catch (Exception e) {
             logger.info("Agent load failed. ", e);
         }
@@ -53,15 +58,41 @@ public class MyAgentMainAgent {
     }
 
     /**
+     * 执行目标类的方法
+     *
+     * @param targetClassName 目标类
+     * @param methodName      目标方法
+     * @param args            方法入参
+     */
+    public static void invokeTargetMethod(String targetClassName, String methodName, Class[] args) {
+        Object targetInstance = getTargetInstances(targetClassName);
+        try {
+            // Runnable.class, long.class, long.class, TimeUnit.class
+            Method method = targetInstance.getClass().getMethod(methodName, args);
+            Runnable runnable = () -> {
+                try {
+                    logger.info("开始睡眠～～～～");
+                    Thread.sleep(5 * 1000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            };
+            method.invoke(targetInstance, runnable, 1L, 3L, TimeUnit.SECONDS);
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
      * 获取类的所有对象实例
      *
      * @param className 类对象
      */
-    public static void getTargetInstances(String className) {
+    public static Object getTargetInstances(String className) {
         Class targetClass = null;
-        Vector<Class> classes = getLoadedClasses(Thread.currentThread().getContextClassLoader());
+        List<Class> classes = getLoadedClasses();
         for (Class cls : classes) {
-            logger.debug("{}", cls.getName());
+            logger.info("{}", cls.getName());
             if (cls.getName().contains(className)) {
                 logger.info("找到目标类 => {}", cls.getName());
                 targetClass = cls;
@@ -70,45 +101,52 @@ public class MyAgentMainAgent {
         }
         if (targetClass == null) {
             logger.error("未找到目标类 [{}]", className);
-            return;
+            throw new RuntimeException("cannot find target class [" + className + "]");
         }
         Object[] instances = InstancesOfClass.getInstances(targetClass);
-        Object targetInstance = null;
+        Object targetInstance;
         if (instances.length != 0) {
             targetInstance = instances[0];
             logger.info("目标类对象实例 => {}", targetInstance);
-            try {
-                Method method = targetInstance.getClass().getMethod("submit");
-                Runnable runnable = () -> {
-                    try {
-                        logger.info("开始睡眠～～～～");
-                        Thread.sleep(5 * 1000);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                };
-                method.invoke(targetInstance, runnable);
-            } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
+            return targetInstance;
+        } else {
+            logger.error("没有找到目标类{}的对象实例", targetClass.getName());
+            throw new RuntimeException("cannot find target object of [" + className + "]");
         }
     }
 
     /**
-     * 获取内存中加载的类
+     * 从类加载获取加载的类
      *
      * @param classLoader 类加载器
      * @return Vector
      */
-    public static Vector<Class> getLoadedClasses(ClassLoader classLoader) {
+    public static Vector<Class> getClassesFromClassLoader(ClassLoader classLoader) {
         try {
             Field classField = ClassLoader.class.getDeclaredField("classes");
             classField.setAccessible(true);
 
             Vector<Class> classes = (Vector<Class>) classField.get(classLoader);
+            if (classes == null) {
+                logger.error("[ClassLoader: {}]未获取到类对象列表", classLoader.toString());
+            }
             return classes;
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static List<Class> getLoadedClasses() {
+        List<Class> classList = new ArrayList<>();
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        while (classLoader != null) {
+            logger.info("current classLoader => {}", classLoader);
+            Vector<Class> classes = getClassesFromClassLoader(classLoader);
+            if (classes != null) {
+                classList.addAll(classes);
+            }
+            classLoader = classLoader.getParent();
+        }
+        return classList;
     }
 }

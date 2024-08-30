@@ -53,3 +53,10 @@ On FreeBSD, you can use the following command to install `jattach`:
 ```
 ./jattach-mac 9755 load instrument false "/.../myThreadAgent.jar=5-60"
 ```
+
+--------------
+
+## 探针小结
+
+### 获取不到类
+通过类加载器中的classes属性获取类的方式，无法获取到Bootstrap启动类加载器加载的类，比如ThreadPoolExecutor；

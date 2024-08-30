@@ -32,6 +32,9 @@ public class Attacher {
     @Option(name = "-c", aliases = "--class", required = true, usage = "target className")
     public String className;
 
+    @Option(name = "-m", aliases = "--method", required = true, usage = "target method")
+    public String methodName;
+
     public static void main(String[] args) throws Exception {
         System.exit(new Attacher().doMain(args));
     }
@@ -40,7 +43,7 @@ public class Attacher {
         CmdLineParser parser = new CmdLineParser(this);
         try {
             parser.parseArgument(args);
-            String params = threadNum + "-" + time + "-" + className;
+            String params = threadNum + "-" + time + "-" + className + "-" + methodName;
             VirtualMachine vm = VirtualMachine.attach(pid);
             vm.loadAgent(agentFile, params);
             return 0;
