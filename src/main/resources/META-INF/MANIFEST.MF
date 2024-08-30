@@ -1,3 +1,7 @@
 Manifest-Version: 1.0
+Agent-Class: com.allen.agent.MyAgentMainAgent
+Can-Redefine-Classes: true
+Can-Retransform-Classes: true
+Can-Set-Native-Method-Prefix: true
+Created-By: allen
 Main-Class: com.allen.Attacher
-

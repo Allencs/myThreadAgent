@@ -1,11 +1,9 @@
 package com.allen;
 
-import com.allen.agent.MyAgentMainAgent;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
-import java.util.Vector;
 
 /**
  * Unit test for simple App.
@@ -35,20 +33,4 @@ public class AppTest
         assertTrue(true);
     }
 
-    public void testGetClasses() {
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-
-        while (classLoader != null) {
-            System.out.println("ClassLoader -> " + classLoader.getClass());
-            System.out.println("----------------------------------------");
-            Vector<Class> classes = MyAgentMainAgent.getLoadedClasses(classLoader);
-
-            for (Class cls : classes) {
-                System.out.println("class => " + cls.getClass());
-                System.out.println(cls.getName());
-            }
-
-            classLoader = classLoader.getParent();
-        }
     }
-}
